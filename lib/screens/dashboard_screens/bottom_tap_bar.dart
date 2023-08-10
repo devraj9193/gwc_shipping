@@ -49,12 +49,12 @@ class _BottomTapBarState extends State<BottomTapBar> {
     final isSelected = index == widget.index;
 
     return Padding(
-      padding: EdgeInsets.all(1.h),
+      padding: EdgeInsets.all(1.5.h),
       child: InkWell(
         child: Image(
-            height: 2.5.h,
+            height: isSelected ? 4.h : 3.5.h,
             image: AssetImage(image),
-            color: isSelected ? gPrimaryColor : gBlackColor,
+            color: isSelected ? gSecondaryColor : gBlackColor,
             fit: BoxFit.contain),
         onTap: () => widget.onChangedTab(index),
       ),
@@ -71,9 +71,9 @@ class _BottomTapBarState extends State<BottomTapBar> {
       padding: EdgeInsets.all(1.h),
       child: InkWell(
         child: Image(
-            height: 2.h,
+            height: isSelected ? 3.h : 2.5.h,
             image: AssetImage(image),
-            color: isSelected ? gPrimaryColor : gBlackColor,
+            color: isSelected ? gSecondaryColor : gBlackColor,
             fit: BoxFit.contain),
         onTap: () => widget.onChangedTab(index),
       ),

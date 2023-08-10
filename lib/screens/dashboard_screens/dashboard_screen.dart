@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../widgets/will_pop_widget.dart';
 import '../gwc_teams_screens/gwc_teams_screen.dart';
-import '../shipping_status_screens/shipping_order_details_screens/profile_screens/profile_screen.dart';
-import '../shipping_status_screens/shipping_status.dart';
+import '../../widgets/will_pop_widget.dart';
+import '../profile_screens/profile_screen.dart';
+import '../../shipment_screens/shipping_status.dart';
 import 'bottom_tap_bar.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -67,6 +67,39 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return WillPopWidget(
       child: SafeArea(
         child: Scaffold(
+          // appBar: AppBar(
+          //
+          //   backgroundColor: gWhiteColor,
+          //   elevation: 0,
+          //   title: Padding(
+          //     padding:  EdgeInsets.symmetric(horizontal: 2.w),
+          //     child: Row(
+          //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //       children: [
+          //         SizedBox(
+          //           height: 15.h,
+          //           child: const Image(
+          //             image: AssetImage("assets/images/Gut wellness logo.png"),
+          //           ),
+          //         ),
+          //         IconButton(
+          //           onPressed: () {
+          //             Navigator.of(context).push(
+          //               MaterialPageRoute(
+          //                 builder: (ct) => const NotificationScreen(),
+          //               ),
+          //             );
+          //           },
+          //           icon: Icon(
+          //             Icons.notifications_outlined,
+          //             color: newBlackColor,
+          //             size: 3.h,
+          //           ),
+          //         ),
+          //       ],
+          //     ),
+          //   ),
+          // ),
           body: pageCaller(_bottomNavIndex),
           bottomNavigationBar: BottomTapBar(
             index: _bottomNavIndex,

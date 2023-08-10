@@ -178,11 +178,11 @@ class MealItemWeight {
 
   factory MealItemWeight.fromJson(Map<String, dynamic> json) => MealItemWeight(
         id: json["id"] ?? "",
-        mealPlanItemId: json["meal_plan_item_id"] ?? "",
-        weight: json["weight"] ?? "",
-        weightTypeId: json["weight_type_id"] ?? "",
-        createdAt: json["created_at"] ?? "",
-        updatedAt: json["updated_at"] ?? "",
+        mealPlanItemId: json["meal_plan_item_id"].toString() ?? "",
+        weight: json["weight"].toString() ?? "",
+        weightTypeId: json["weight_type_id"].toString() ?? "",
+        createdAt: json["created_at"].toString() ?? "",
+        updatedAt: json["updated_at"].toString() ?? "",
         weightType: WeightType.fromJson(json["weight_type"] ?? ""),
       );
 
@@ -212,9 +212,9 @@ class WeightType {
 
   factory WeightType.fromJson(Map<String, dynamic> json) => WeightType(
         id: json["id"] ?? "",
-        unit: json["unit"] ?? "",
-        createdAt: json["created_at"] ?? "",
-        updatedAt: json["updated_at"] ?? "",
+        unit: json["unit"].toString() ?? "",
+        createdAt: json["created_at"].toString() ?? "",
+        updatedAt: json["updated_at"].toString() ?? "",
       );
 
   Map<String, dynamic> toJson() => {

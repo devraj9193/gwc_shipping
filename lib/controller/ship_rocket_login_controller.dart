@@ -19,9 +19,12 @@ class ShipRocketLoginController extends GetxController {
           "Content_Type": "application/json",
         },
       );
+      print("ship rocket body : $dataBody");
+      print("ship rocket response : ${response.body}");
+
       if (response.statusCode == 200) {
         Map<String, dynamic> responseData = jsonDecode(response.body);
-     //   print(response.body);
+        print("ship rocket token : ${responseData["token"]}");
         saveData(responseData["token"]);
         if (responseData['status'] == 200) {
           buildSnackBar("Login", "Successful");

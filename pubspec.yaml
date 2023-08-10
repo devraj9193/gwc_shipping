@@ -39,8 +39,8 @@ dependencies:
   device_preview: ^1.0.0
   sizer: ^2.0.15
   get: ^4.6.1
-  flutter_svg: ^1.0.3
-  syncfusion_flutter_pdfviewer: ^20.2.50-beta
+  flutter_svg: ^2.0.4
+  syncfusion_flutter_pdfviewer: ^22.2.5
   lottie: ^2.1.0
   http: any
   shared_preferences: any
@@ -49,12 +49,30 @@ dependencies:
   printing: ^5.9.3
   pdf: ^3.8.3
   platform_device_id: ^1.0.1
+  intl: ^0.18.0
+  jwt_decode: ^0.3.1
+
+  #dashboard date picker
+
+
+  #shiprocket
+  timeline_tile: ^2.0.0
+  simple_ripple_animation: ^0.0.7
 
   # Firebase
   firebase_core: ^2.4.1
   firebase_messaging: ^14.2.1
-  flutter_local_notifications: ^13.0.0
+  flutter_local_notifications: ^15.1.0+1
   cloud_firestore: any
+
+  # internet checking
+  internet_connection_checker: any
+  connectivity_plus: any
+  data_connection_checker_nulls: ^0.0.2
+
+  #app update
+  upgrader: ^8.0.0
+  store_redirect: ^2.0.1
 
 dev_dependencies:
   flutter_test:

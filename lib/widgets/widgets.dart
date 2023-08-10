@@ -3,7 +3,27 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:im_animations/im_animations.dart';
 import 'package:sizer/sizer.dart';
 import 'package:get/get.dart';
+import '../screens/dashboard_screens/notification_screen.dart';
+import '../utils/common_screen_widget.dart';
 import '../utils/constants.dart';
+
+List shippingDetails = [
+  {
+    "title": "Mainfest",
+    "image": "assets/images/Group 3007.png",
+    "id": "1",
+  },
+  {
+    "title": "Labels",
+    "image": "assets/images/Group 3009.png",
+    "id": "2",
+  },
+  {
+    "title": "Welcome Letter",
+    "image": "assets/images/Group 3009.png",
+    "id": "3",
+  }
+];
 
 Center buildLoadingBar() {
   return Center(
@@ -29,6 +49,27 @@ Center buildLoadingBar() {
           strokeWidth: 2.5,
         ),
       ),
+    ),
+  );
+}
+
+profileTile(String title, String subTitle) {
+  return Padding(
+    padding: EdgeInsets.symmetric(vertical: 0.5.h, horizontal: 5.w),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: AllListText().otherText(),
+        ),
+        Expanded(
+          child: Text(
+            subTitle,
+            style: AllListText().subHeadingText(),
+          ),
+        ),
+      ],
     ),
   );
 }
@@ -65,22 +106,48 @@ SnackbarController buildSnackBar(String title, String subTitle) {
   );
 }
 
+Row buildDashboardAppBar() {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+      SizedBox(
+        height: 7.h,
+        child: const Image(
+          image: AssetImage("assets/images/Gut wellness logo.png"),
+        ),
+      ),
+      IconButton(
+        onPressed: () {
+          Get.to(() => const NotificationScreen());
+        },
+        icon: Icon(
+          Icons.notifications_outlined,
+          color: newBlackColor,
+          size: 3.5.h,
+        ),
+      ),
+    ],
+  );
+}
+
 Row buildAppBar(VoidCallback func) {
   return Row(
     children: [
       SizedBox(
-        height: 1.5.h,
+        height: 2.h,
         child: InkWell(
           onTap: func,
           child: const Image(
+            color: gMainColor,
             image: AssetImage("assets/images/Icon ionic-ios-arrow-back.png"),
           ),
         ),
       ),
+      SizedBox(width: 2.w),
       SizedBox(
-        height: 6.h,
+        height: 7.h,
         child: const Image(
-          image: AssetImage("assets/images/Gut wellness logo green.png"),
+          image: AssetImage("assets/images/Gut wellness logo.png"),
         ),
       ),
     ],
@@ -92,8 +159,7 @@ Center buildCircularIndicator() {
     child: HeartBeat(
         child: Image.asset(
       'assets/images/progress_logo.png',
-      // width: 75,
-      // height: 75,
+      height: 15.h,
     )),
   );
 }
@@ -102,7 +168,7 @@ buildThreeBounceIndicator({Color? color}) {
   return Center(
     child: SpinKitThreeBounce(
       color: color ?? gMainColor,
-      size: 30,
+      size: 50,
     ),
   );
 }
@@ -114,13 +180,13 @@ showSnackBar(BuildContext context, String message, Color color,
       behavior: SnackBarBehavior.floating,
       backgroundColor: color,
       margin: EdgeInsets.symmetric(horizontal: 2.w, vertical: 1.h),
-      padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 1.h),
+      padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
       content: Text(
         message,
         style: TextStyle(
-          fontFamily: "GothamMedium",
-          color: kWhiteColor,
-          fontSize: 7.sp,
+          fontFamily: fontMedium,
+          color: gWhiteColor,
+          fontSize: fontSize10,
         ),
       ),
       duration: Duration(seconds: duration ?? 2),

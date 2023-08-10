@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 import 'package:get/get.dart';
 import '../../controller/notification_list_controller.dart';
+import '../../utils/common_screen_widget.dart';
 import '../../utils/constants.dart';
 import '../../widgets/widgets.dart';
 
@@ -17,66 +18,33 @@ class _NotificationScreenState extends State<NotificationScreen> {
       Get.put(NotificationListController());
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        image: DecorationImage(
-            image: AssetImage("assets/images/eval_bg.png"),
-            fit: BoxFit.fill,
-            colorFilter: ColorFilter.mode(gSecondaryColor, BlendMode.lighten)),
-      ),
-      child: SafeArea(
-        child: Scaffold(
-            backgroundColor: Colors.transparent,
-            body: Column(
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(left: 4.w, right: 4.w, top: 3.h),
-                  child: buildAppBar(() {
-                    Navigator.pop(context);
-                  }),
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: Padding(
+          padding:
+              EdgeInsets.only(top: 1.h, left: 4.w, right: 4.w, bottom: 1.w),
+          child: Column(
+            children: [
+              buildAppBar(() {
+                Navigator.pop(context);
+              }),
+              SizedBox(height: 2.h),
+              Align(
+                alignment: Alignment.topLeft,
+                child: Text(
+                  "Notification",
+                  textAlign: TextAlign.center,
+                  style: ProfileScreenText().headingText(),
                 ),
-                SizedBox(height: 2.h),
-                Expanded(
-                  child: Container(
-                    width: double.maxFinite,
-                    padding: EdgeInsets.only(right: 3.w, top: 3.h, left: 3.w),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                            blurRadius: 2, color: Colors.grey.withOpacity(0.5))
-                      ],
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(70),
-                        topRight: Radius.circular(70),
-                      ),
-                    ),
-                    child: Column(
-                      children: [
-                        Align(
-                          alignment: Alignment.topLeft,
-                          child: Text(
-                            "Notification",
-                            style: TextStyle(
-                                fontFamily: "GothamBold",
-                                color: gMainColor,
-                                fontSize: 10.sp),
-                          ),
-                        ),
-                        Container(
-                          height: 1,
-                          margin: EdgeInsets.symmetric(vertical: 1.5.h),
-                          color: Colors.grey.withOpacity(0.5),
-                        ),
-                        Expanded(
-                          child: buildNotificationList(),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            )),
+              ),
+              SizedBox(height: 3.h),
+              Expanded(
+                child: buildNotificationList(),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -105,35 +73,31 @@ class _NotificationScreenState extends State<NotificationScreen> {
               itemBuilder: (context, index) {
                 return GestureDetector(
                   onTap: () {
-                    if (snapshot.data[index].notificationType == "meal_plan") {
+                    if (data[index].notificationType == "meal_plan") {
                       // Navigator.of(context).push(
                       //   MaterialPageRoute(
                       //     builder: (context) => const Activities(),
                       //   ),
                       // );
-                    } else if (snapshot.data[index].notificationType ==
-                        "enquiry") {
+                    } else if (data[index].notificationType == "enquiry") {
                       // Navigator.of(context).push(
                       //   MaterialPageRoute(
                       //     builder: (context) => const TaskList(),
                       //   ),
                       // );
-                    } else if (snapshot.data[index].notificationType ==
-                        "report") {
+                    } else if (data[index].notificationType == "report") {
                       // Navigator.of(context).push(
                       //   MaterialPageRoute(
                       //     builder: (context) => const Messages(),
                       //   ),
                       // );
-                    } else if (snapshot.data[index].notificationType ==
-                        "appointment") {
+                    } else if (data[index].notificationType == "appointment") {
                       // Navigator.of(context).push(
                       //   MaterialPageRoute(
                       //     builder: (context) => const NoticeBoard(),
                       //   ),
                       // );
-                    } else if (snapshot.data[index].notificationType ==
-                        "shopping") {
+                    } else if (data[index].notificationType == "shopping") {
                       // Navigator.of(context).push(
                       //   MaterialPageRoute(
                       //     builder: (context) => const NoticeBoard(),
@@ -144,44 +108,31 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   child: Column(
                     children: [
                       Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 2.w),
+                        padding: EdgeInsets.symmetric(horizontal: 2.w,vertical: 1.h),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            buildNotificationType(""),
+                            buildNotificationType(
+                              data[index].type.toString(),
+                            ),
                             SizedBox(width: 3.w),
                             Expanded(
                               flex: 1,
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    "Payment is done",
-                                    style: TextStyle(
-                                      fontFamily: "GothamBold",
-                                      fontSize: 9.sp,
-                                      color: gPrimaryColor,
-                                    ),
+                                  Text(data[index].subject ?? "",
+                                      style: AllListText().headingText()),
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 10.0),
+                                    child: Text(data[index].message ?? "",
+                                        style: AllListText()
+                                            .notificationSubHeadingText()),
                                   ),
                                   SizedBox(height: 0.5.h),
-                                  Text(
-                                    "Your enquiry was successfully verified. Tap to sign it right now!",
-                                    style: TextStyle(
-                                      fontFamily: "GothamBook",
-                                      height: 1.3,
-                                      fontSize: 8.sp,
-                                      color: gBlackColor,
-                                    ),
-                                  ),
-                                  SizedBox(height: 0.5.h),
-                                  Text(
-                                    "1 month ago",
-                                    style: TextStyle(
-                                      fontFamily: "GothamBook",
-                                      fontSize: 8.sp,
-                                      color: gBlackColor,
-                                    ),
-                                  ),
+                                  Text(data[index].createdAt ?? "",
+                                      style: AllListText()
+                                          .notificationOtherText()),
                                 ],
                               ),
                             ),
@@ -189,9 +140,19 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         ),
                       ),
                       Container(
-                        height: 1,
-                        margin: EdgeInsets.symmetric(vertical: 2.h),
-                        color: Colors.grey.withOpacity(0.3),
+                        height: 1.0,
+                        margin: EdgeInsets.symmetric(horizontal: 2.w, vertical: 2.h),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.withOpacity(0.2),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.2),
+                              spreadRadius: 2,
+                              blurRadius: 5,
+                              offset: const Offset(0, 4), // changes position of shadow
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -212,33 +173,67 @@ class _NotificationScreenState extends State<NotificationScreen> {
     if (type == "meal_plan") {
       return buildContainer(image: 'assets/images/Group 5042.png');
     } else if (type == "enquiry") {
-      return buildContainer(image: 'assets/images/noun-successful-payment-4652687.png');
+      return buildContainer(
+          image: 'assets/images/noun-successful-payment-4652687.png');
     } else if (type == "report") {
       return buildContainer(image: 'assets/images/Group 4926.png');
     } else if (type == "appointment") {
-      return buildContainer(image: "assets/images/noun-appointment-4878328.png");
+      return buildContainer(
+          image: "assets/images/noun-appointment-4878328.png");
     } else if (type == "shopping") {
       return buildContainer(image: "assets/images/Group 5058.png");
-    } else {}
+    } else if (type == "preparatory_started") {
+      return buildContainer(
+          image: 'assets/images/noun-successful-payment-4652687.png');
+    } else if (type == "new_appointment") {
+      return buildContainer(image: 'assets/images/Group 4926.png');
+    } else if (type == "program_completed") {
+      return buildContainer(
+          image: "assets/images/noun-appointment-4878328.png");
+    } else if (type == "transition_completed") {
+      return buildContainer(image: "assets/images/Group 5058.png");
+    } else if (type == "preparatory_completed") {
+      return buildContainer(
+          image: 'assets/images/noun-successful-payment-4652687.png');
+    } else if (type == "transition_started") {
+      return buildContainer(image: 'assets/images/Group 4926.png');
+    } else if (type == "start_program") {
+      return buildContainer(
+          image: "assets/images/noun-appointment-4878328.png");
+    } else if (type == "order") {
+      return buildContainer(image: "assets/images/Group 5058.png");
+    } else if (type == "consultation_rejected") {
+      return buildContainer(
+          image: 'assets/images/noun-successful-payment-4652687.png');
+    } else if (type == "reminder_appointment") {
+      return buildContainer(image: 'assets/images/Group 4926.png');
+    } else {
+      return Container(
+        height: 4.5.h,
+        width: 10.w,
+        color: gSecondaryColor,
+      );
+    }
   }
 
   buildContainer({required String image}) {
     return Container(
-      height: 4.7.h,
-      width: 11.w,
-      padding: EdgeInsets.symmetric(horizontal: 1.w, vertical: 0.3.h),
-      decoration: BoxDecoration(
-        color: gMainColor,
-        borderRadius: BorderRadius.circular(5),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.3),
-            blurRadius: 3,
-            offset: const Offset(2, 3),
-          ),
-        ],
+      height: 4.5.h,
+      width: 10.w,
+      padding: const EdgeInsets.all(5),
+      decoration: const BoxDecoration(
+        color: gWhiteColor,
+        // borderRadius: BorderRadius.circular(5),
+        // boxShadow: [
+        //   BoxShadow(
+        //     color: Colors.grey.withOpacity(0.3),
+        //     blurRadius: 3,
+        //     offset: const Offset(2, 3),
+        //   ),
+        // ],
       ),
       child: Image(
+        color: gBlackColor,
         image: AssetImage(image),
       ),
     );

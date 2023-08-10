@@ -17,11 +17,14 @@ class CustomerOrderDetailsController extends GetxController {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     var token = preferences.getString("token")!;
     var userId = preferences.getInt("user_id");
+    print("Order Details : $userId");
+    print("Order Details : $token");
 
     final response = await http
         .get(Uri.parse("${GwcApi.userOrderDetailsApiUrl}/$userId"), headers: {
       'Authorization': 'Bearer $token',
     });
+    print("Order Details : ${response.body}");
     if (response.statusCode == 200) {
       CustomerOrderDetails jsonData =
           customerOrderDetailsFromJson(response.body);

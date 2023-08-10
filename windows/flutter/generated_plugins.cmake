@@ -3,6 +3,8 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  connectivity_plus
+  firebase_core
   platform_device_id_windows
   printing
   syncfusion_pdfviewer_windows

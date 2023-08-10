@@ -3,13 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shipping_app/screens/dashboard_screens/dashboard_screen.dart';
 import 'package:shipping_app/screens/dashboard_screens/notification_screen.dart';
+import 'package:shipping_app/utils/gwc_apis.dart';
 import 'package:shipping_app/widgets/background_widget.dart';
 import 'package:shipping_app/utils/constants.dart';
 import 'package:shipping_app/widgets/will_pop_widget.dart';
 import 'package:sizer/sizer.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'login_screens/shipping_login.dart';
+import 'screens/login_screens/shipping_login.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -23,14 +24,23 @@ class _SplashScreenState extends State<SplashScreen> {
   int _currentPage = 0;
   Timer? _timer;
   static final _notificationsPlugin = FlutterLocalNotificationsPlugin();
+  final SharedPreferences _pref = GwcApi.preferences!;
+
   String loginStatus = "";
   String deviceToken = "";
+  bool isLogin = false;
 
   getPref() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
     setState(() {
-      loginStatus = preferences.getString("token")!;
+      isLogin = _pref.getBool(GwcApi.isLogin) ?? false;
     });
+    print("_pref.getBool(AppConfig.isLogin): ${_pref.getBool(GwcApi.isLogin)}");
+    print("isLogin: $isLogin");
+    // SharedPreferences preferences = await SharedPreferences.getInstance();
+    // setState(() {
+    //   loginStatus = preferences.getString(AppConfig().bearerToken)!;
+    //   print("Token: $loginStatus");
+    // });
   }
 
   @override
@@ -75,7 +85,7 @@ class _SplashScreenState extends State<SplashScreen> {
     );
     _notificationsPlugin.initialize(
       initializationSettings,
-      onDidReceiveNotificationResponse: onDidReceiveNotificationResponse,
+      // onDidReceiveNotificationResponse: onDidReceiveNotificationResponse,
     );
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
@@ -105,6 +115,25 @@ class _SplashScreenState extends State<SplashScreen> {
           message.notification?.body, platformChannelSpecifics,
           payload: message.data['title']);
     });
+
+    FirebaseMessaging.onMessageOpenedApp.listen(
+      (message) async {
+        print("FirebaseMessaging.onMessageOpenedApp.listen");
+        if (message.notification != null) {
+          print(
+              "message.notification!.title : ${message.data["title"].toString()}");
+          print(message.notification!.body);
+          print(message.toMap());
+          print("message.data22 ${message.data['notification_type']}");
+          await Navigator.push(
+            context,
+            MaterialPageRoute<void>(
+              builder: (context) => const NotificationScreen(),
+            ),
+          );
+        }
+      },
+    );
   }
 
   void onDidReceiveNotificationResponse(
@@ -151,6 +180,8 @@ class _SplashScreenState extends State<SplashScreen> {
         print("Device Token is : $deviceToken");
       });
     });
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    preferences.setString("device_token", deviceToken);
   }
 
   @override
@@ -169,9 +200,7 @@ class _SplashScreenState extends State<SplashScreen> {
               controller: _pageController,
               children: <Widget>[
                 splashImage(),
-                (loginStatus.isNotEmpty)
-                    ? const DashboardScreen()
-                    : const ShippingLogin(),
+                (isLogin) ? const DashboardScreen() : const ShippingLogin(),
               ],
             ),
           ],

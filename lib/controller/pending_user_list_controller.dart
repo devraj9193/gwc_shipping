@@ -19,7 +19,7 @@ class PendingUserListController extends GetxController {
   Future<List<Pending>?> getPendingUserListData() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     var token = preferences.getString("token")!;
-
+    print(token);
     final response =
         await http.get(Uri.parse(GwcApi.pendingUserListApiUrl), headers: {
       'Authorization': 'Bearer $token',
@@ -29,6 +29,7 @@ class PendingUserListController extends GetxController {
       PendingUserList jsonData = pendingUserListFromJson(response.body);
       List<Pending>? arrData = jsonData.data?.pending;
       print("status: ${arrData?[0].status}");
+      print("Paused List : ${jsonData.data?.pending}");
       return arrData;
     } else {
       throw Exception();
@@ -44,9 +45,11 @@ class PendingUserListController extends GetxController {
           await http.get(Uri.parse(GwcApi.pendingUserListApiUrl), headers: {
         'Authorization': 'Bearer $token',
       });
+      print("Paused List : ${response.body}");
       if (response.statusCode == 200) {
         PendingUserList jsonData = pendingUserListFromJson(response.body);
         List<Pending>? arrData = jsonData.data?.paused;
+        print("Paused List : ${jsonData.data?.paused}");
         return arrData;
       } else {
         throw Exception();
