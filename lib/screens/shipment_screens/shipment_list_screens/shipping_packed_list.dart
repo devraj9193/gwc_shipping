@@ -3,21 +3,21 @@ import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../model/pending_list_model.dart';
-import '../../utils/common_screen_widget.dart';
-import '../../utils/constants.dart';
-import '../../widgets/customers_list_widgets.dart';
+import '../../../model/pending_list_model.dart';
+import '../../../utils/common_screen_widget.dart';
+import '../../../utils/constants.dart';
+import '../../../widgets/customers_list_widgets.dart';
 import '../shipping_details_screen.dart';
 
-class ShippingPendingList extends StatefulWidget {
-  final List<Pending> pendingList;
-  const ShippingPendingList({Key? key, required this.pendingList}) : super(key: key);
+class ShippingPackedList extends StatefulWidget {
+  final List<Approved> packedList;
+  const ShippingPackedList({Key? key, required this.packedList}) : super(key: key);
 
   @override
-  State<ShippingPendingList> createState() => _ShippingPendingListState();
+  State<ShippingPackedList> createState() => _ShippingPackedListState();
 }
 
-class _ShippingPendingListState extends State<ShippingPendingList> {
+class _ShippingPackedListState extends State<ShippingPackedList> {
   DateTime initialDate = DateTime.now();
   DateTime? selectedDate;
 
@@ -57,60 +57,76 @@ class _ShippingPendingListState extends State<ShippingPendingList> {
               ],
             ),
           ),
-          widget.pendingList.isNotEmpty
+          widget.packedList.isNotEmpty
               ? ListView.builder(
             scrollDirection: Axis.vertical,
             padding: EdgeInsets.symmetric(horizontal: 1.w),
             physics: const ScrollPhysics(),
             shrinkWrap: true,
-            itemCount: widget.pendingList.length,
+            itemCount: widget.packedList.length,
             itemBuilder: ((context, index) {
-              var data = widget.pendingList[index];
+              var data = widget.packedList[index];
               return selectedDate == null
                   ? GestureDetector(
                 onTap: () {
+                  // shipRocketLoginController
+                  //     .shipRocketLogin();
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (ct) =>
-                      ShippingDetailsScreen(
-                        userName: data.patient?.user?.name ?? '',
-                        address: data.patient?.address2 ?? '',
-                        addressNo: data.patient?.user?.address ?? '',
-                        userId: data.patient?.user?.id.toString() ?? '',
-                        status: data.patient?.status ?? '',
+                      builder: (ct) => ShippingDetailsScreen(
+                        isTracking: true,
+                        label: data.orders ?? [],
+                        userId: data.patient?.user?.id.toString() ?? "",
+                        userName:
+                        data.patient?.user?.name ?? "",
+                        address:
+                        data.patient?.address2 ?? "",
+                         status: data.patient?.status ?? "",
+                        addressNo: data.patient?.user?.address ?? "",
                       ),
-                          // PendingPausedOrderDetails(
-                          //   userName: data.patient?.user?.name ?? '',
-                          //   address: data.patient?.address2 ?? '',
-                          //   addressNo: data.patient?.user?.address ?? '',
-                          //   userId: data.patient?.user?.id.toString() ?? '',
-                          // ),
+                      //     ApprovedOrderDetails(
+                      //   label: data.orders ?? [],userId: data.patient?.user?.id.toString() ?? "",
+                      //   userName:
+                      //   data.patient?.user?.name ?? "",
+                      //   address:
+                      //   data.patient?.address2 ?? "",
+                      //   shipmentId: data.orders?.first.shippingId ?? "",
+                      //   orderId: data.orders?.first.orderId ?? "",
+                      //   status: data.orders?.first.status ?? "",
+                      //   addressNo: data.patient?.user?.address ??
+                      //       "",
+                      //   pickupDate: data.orders?.first.pickupScheduledDate ??
+                      //       "",
+                      //   awbNumber: data.orders?.first.awbCode ?? "",
+                      // ),
                     ),
                   );
                 },
                 child: Column(
                   children: [
                     Row(
-                      crossAxisAlignment:
-                      CrossAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         CircleAvatar(
                           radius: 3.h,
                           backgroundImage: NetworkImage(
-                            data.patient?.user?.profile ?? '',
+                            "${data.patient?.user?.profile}",
                           ),
                         ),
                         SizedBox(width: 3.w),
                         Expanded(
                           child: Column(
-                            crossAxisAlignment:
-                            CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                data.patient?.user?.name ?? "",
-                                style: AllListText()
-                                    .headingText(),
+                                data.patient?.user?.name ?? '',
+                                style: AllListText().headingText(),
                               ),
+                              // SizedBox(height: 0.5.h),
+                              // Text(
+                              //   "${data?.appointmentDate} / ${data?.appointmentTime}",
+                              //   style: AllListText().subHeadingText(),
+                              // ),
                               Row(
                                 children: [
                                   Text(
@@ -145,15 +161,14 @@ class _ShippingPendingListState extends State<ShippingPendingList> {
                           ),
                         ),
                         Text(
-                          data.updateTime.toString(),
+                          data.updateTime ?? '',
                           style: AllListText().otherText(),
                         ),
                       ],
                     ),
                     Container(
                       height: 1,
-                      margin: EdgeInsets.symmetric(
-                          vertical: 2.5.h),
+                      margin: EdgeInsets.symmetric(vertical: 2.5.h),
                       color: gBlackColor.withOpacity(0.5),
                     ),
                   ],
@@ -166,46 +181,64 @@ class _ShippingPendingListState extends State<ShippingPendingList> {
                   data.patient?.shippingDeliveryDate.toString()
                   ? GestureDetector(
                 onTap: () {
+                  // shipRocketLoginController
+                  //     .shipRocketLogin();
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (ct) =>ShippingDetailsScreen(
-                        userName: data.patient?.user?.name ?? '',
-                        address: data.patient?.address2 ?? '',
-                        addressNo: data.patient?.user?.address ?? '',
-                        userId: data.patient?.user?.id.toString() ?? '',
-                        status: data.patient?.status ?? '',
+                      builder: (ct) =>  ShippingDetailsScreen(
+                        isTracking: true,
+                        label: data.orders ?? [],
+                        userId: data.patient?.user?.id.toString() ?? "",
+                        userName:
+                        data.patient?.user?.name ?? "",
+                        address:
+                        data.patient?.address2 ?? "",
+                        status: data.patient?.status ?? "",
+                        addressNo: data.patient?.user?.address ?? "",
                       ),
-                          // PendingPausedOrderDetails(
-                          //   userName: data.patient?.user?.name ?? '',
-                          //   address: data.patient?.address2 ?? '',
-                          //   addressNo: data.patient?.user?.address ?? '', userId: data.patient?.user?.id.toString() ?? '',
-                          // ),
+                      //     ApprovedOrderDetails(
+                      //   label: data.orders ?? [],userId: data.patient?.user?.id.toString() ?? "",
+                      //   userName:
+                      //   data.patient?.user?.name ?? "",
+                      //   address:
+                      //   data.patient?.address2 ?? "",
+                      //   shipmentId: data.orders?.first.shippingId ?? "",
+                      //   orderId: data.orders?.first.orderId ?? "",
+                      //   status: data.orders?.first.status ?? "",
+                      //   addressNo: data.patient?.user?.address ??
+                      //       "",
+                      //   pickupDate: data.orders?.first.pickupScheduledDate ??
+                      //       "",
+                      //   awbNumber: data.orders?.first.awbCode ?? "",
+                      // ),
                     ),
                   );
                 },
                 child: Column(
                   children: [
                     Row(
-                      crossAxisAlignment:
-                      CrossAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         CircleAvatar(
                           radius: 3.h,
                           backgroundImage: NetworkImage(
-                            data.patient?.user?.profile ?? '',
+                            "${data.patient?.user?.profile}",
                           ),
                         ),
                         SizedBox(width: 3.w),
                         Expanded(
                           child: Column(
-                            crossAxisAlignment:
-                            CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                data.patient?.user?.name ?? "",
-                                style: AllListText()
-                                    .headingText(),
+                                data.patient?.user?.name ?? '',
+                                style: AllListText().headingText(),
                               ),
+                              // SizedBox(height: 0.5.h),
+                              // Text(
+                              //   "${data?.appointmentDate} / ${data?.appointmentTime}",
+                              //   style: AllListText().subHeadingText(),
+                              // ),
                               Row(
                                 children: [
                                   Text(
@@ -220,19 +253,20 @@ class _ShippingPendingListState extends State<ShippingPendingList> {
                                   ),
                                 ],
                               ),
-                              data.patient?.shippingDeliveryDate ==
-                                  null
+                              data.patient?.shippingDeliveryDate == null
                                   ? const SizedBox()
                                   : Row(
                                 children: [
                                   Text(
-                                    "Shipping Delivery Date : ",
-                                    style: AllListText()
-                                        .otherText(),
+                                    "Requested Delivery Date : ",
+                                    style: AllListText().otherText(),
                                   ),
                                   Text(
-                                    data.patient?.shippingDeliveryDate ?? '',
-                                    style: AllListText().subHeadingText(),
+                                    data.patient
+                                        ?.shippingDeliveryDate ??
+                                        '',
+                                    style:
+                                    AllListText().subHeadingText(),
                                   ),
                                 ],
                               ),
@@ -240,15 +274,14 @@ class _ShippingPendingListState extends State<ShippingPendingList> {
                           ),
                         ),
                         Text(
-                          data.updateTime.toString(),
+                          data.updateTime ?? '',
                           style: AllListText().otherText(),
                         ),
                       ],
                     ),
                     Container(
                       height: 1,
-                      margin: EdgeInsets.symmetric(
-                          vertical: 2.5.h),
+                      margin: EdgeInsets.symmetric(vertical: 2.5.h),
                       color: gBlackColor.withOpacity(0.5),
                     ),
                   ],
@@ -259,7 +292,7 @@ class _ShippingPendingListState extends State<ShippingPendingList> {
           )
               : Image(
             image:
-            const AssetImage("assets/images/Group 5295.png"),
+            const AssetImage("assets/images/Group 5294.png"),
             height: 25.h,
           ),
         ],

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../gwc_teams_screens/gwc_teams_screen.dart';
 import '../../widgets/will_pop_widget.dart';
 import '../profile_screens/profile_screen.dart';
-import '../../shipment_screens/shipping_status.dart';
+import '../shipment_screens/shipping_status.dart';
 import 'bottom_tap_bar.dart';
 
 class DashboardScreen extends StatefulWidget {

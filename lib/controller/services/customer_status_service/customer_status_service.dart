@@ -14,4 +14,17 @@ class CustomerStatusService extends ChangeNotifier {
     return await customerStatusRepo.getShoppingItemRepo(userId);
   }
 
+  Future sendShippingStatusService(
+    String status,
+    String reason,
+    String weight,
+    String userId,
+  ) async {
+    return await customerStatusRepo.sendShippingStatusRepo(
+      status,
+      reason,
+      weight,
+      userId,
+    );
+  }
 }

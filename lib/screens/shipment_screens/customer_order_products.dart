@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
+import 'package:http/http.dart' as http;
+
 import '../../controller/repository/customer_status_repo.dart/customer_status_repo.dart';
 import '../../controller/services/api_services.dart';
 import '../../controller/services/customer_status_service/customer_status_service.dart';
@@ -7,8 +9,6 @@ import '../../model/customer_order_details_model.dart';
 import '../../model/error_model.dart';
 import '../../utils/common_screen_widget.dart';
 import '../../utils/constants.dart';
-import 'package:http/http.dart' as http;
-
 import '../../widgets/widgets.dart';
 
 class CustomerOrderProducts extends StatefulWidget {

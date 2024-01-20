@@ -1,30 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../controller/ship_rocket_login_controller.dart';
-import '../../model/pending_list_model.dart';
-import '../../utils/common_screen_widget.dart';
-import '../../utils/constants.dart';
-import '../../widgets/customers_list_widgets.dart';
+import '../../../model/pending_list_model.dart';
+import '../../../utils/common_screen_widget.dart';
+import '../../../utils/constants.dart';
+import '../../../widgets/customers_list_widgets.dart';
 import '../shipping_details_screen.dart';
 
-class ShippingPackedList extends StatefulWidget {
-  final List<Approved> packedList;
-  const ShippingPackedList({Key? key, required this.packedList}) : super(key: key);
+class ShippingDeliveredList extends StatefulWidget {
+  final List<Approved> deliveredList;
+  const ShippingDeliveredList({Key? key, required this.deliveredList}) : super(key: key);
 
   @override
-  State<ShippingPackedList> createState() => _ShippingPackedListState();
+  State<ShippingDeliveredList> createState() => _ShippingDeliveredListState();
 }
 
-class _ShippingPackedListState extends State<ShippingPackedList> {
+class _ShippingDeliveredListState extends State<ShippingDeliveredList> {
   DateTime initialDate = DateTime.now();
   DateTime? selectedDate;
-
-  ShipRocketLoginController shipRocketLoginController =
-      Get.put(ShipRocketLoginController());
 
   @override
   Widget build(BuildContext context) {
@@ -62,20 +56,18 @@ class _ShippingPackedListState extends State<ShippingPackedList> {
               ],
             ),
           ),
-          widget.packedList.isNotEmpty
+          widget.deliveredList.isNotEmpty
               ? ListView.builder(
             scrollDirection: Axis.vertical,
             padding: EdgeInsets.symmetric(horizontal: 1.w),
             physics: const ScrollPhysics(),
             shrinkWrap: true,
-            itemCount: widget.packedList.length,
+            itemCount: widget.deliveredList.length,
             itemBuilder: ((context, index) {
-              var data = widget.packedList[index];
+              var data = widget.deliveredList[index];
               return selectedDate == null
                   ? GestureDetector(
                 onTap: () {
-                  // shipRocketLoginController
-                  //     .shipRocketLogin();
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (ct) => ShippingDetailsScreen(
@@ -86,23 +78,27 @@ class _ShippingPackedListState extends State<ShippingPackedList> {
                         data.patient?.user?.name ?? "",
                         address:
                         data.patient?.address2 ?? "",
-                         status: data.patient?.status ?? "",
+                        status: data.patient?.status ?? "",
                         addressNo: data.patient?.user?.address ?? "",
                       ),
                       //     ApprovedOrderDetails(
-                      //   label: data.orders ?? [],userId: data.patient?.user?.id.toString() ?? "",
+                      //   label: data.orders ?? [],
                       //   userName:
-                      //   data.patient?.user?.name ?? "",
+                      //   data.patient?.user?.name ??
+                      //       "",
                       //   address:
-                      //   data.patient?.address2 ?? "",
+                      //   data.patient?.address2 ??
+                      //       "",
                       //   shipmentId: data.orders?.first.shippingId ?? "",
-                      //   orderId: data.orders?.first.orderId ?? "",
-                      //   status: data.orders?.first.status ?? "",
+                      //   orderId: data.orders?.first.orderId ??
+                      //       "",
+                      //   status: data.orders?.first.status ??
+                      //       "",
                       //   addressNo: data.patient?.user?.address ??
                       //       "",
                       //   pickupDate: data.orders?.first.pickupScheduledDate ??
                       //       "",
-                      //   awbNumber: data.orders?.first.awbCode ?? "",
+                      //   awbNumber: data.orders?.first.awbCode ?? '', userId: data.patient?.user?.id.toString() ?? "",
                       // ),
                     ),
                   );
@@ -146,19 +142,20 @@ class _ShippingPackedListState extends State<ShippingPackedList> {
                                   ),
                                 ],
                               ),
-                              data.patient?.shippingDeliveryDate ==
-                                  null
+                              data.patient?.shippingDeliveryDate == null
                                   ? const SizedBox()
                                   : Row(
                                 children: [
                                   Text(
-                                    "Shipping Delivery Date : ",
-                                    style: AllListText()
-                                        .otherText(),
+                                    "Requested Delivery Date : ",
+                                    style: AllListText().otherText(),
                                   ),
                                   Text(
-                                    data.patient?.shippingDeliveryDate ?? '',
-                                    style: AllListText().subHeadingText(),
+                                    data.patient
+                                        ?.shippingDeliveryDate ??
+                                        '',
+                                    style:
+                                    AllListText().subHeadingText(),
                                   ),
                                 ],
                               ),
@@ -186,11 +183,9 @@ class _ShippingPackedListState extends State<ShippingPackedList> {
                   data.patient?.shippingDeliveryDate.toString()
                   ? GestureDetector(
                 onTap: () {
-                  // shipRocketLoginController
-                  //     .shipRocketLogin();
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (ct) =>  ShippingDetailsScreen(
+                      builder: (ct) => ShippingDetailsScreen(
                         isTracking: true,
                         label: data.orders ?? [],
                         userId: data.patient?.user?.id.toString() ?? "",
@@ -202,19 +197,24 @@ class _ShippingPackedListState extends State<ShippingPackedList> {
                         addressNo: data.patient?.user?.address ?? "",
                       ),
                       //     ApprovedOrderDetails(
-                      //   label: data.orders ?? [],userId: data.patient?.user?.id.toString() ?? "",
+                      //   label: data.orders ?? [],
+                      //   userId: data.patient?.user?.id.toString() ?? "",
                       //   userName:
-                      //   data.patient?.user?.name ?? "",
+                      //   data.patient?.user?.name ??
+                      //       "",
                       //   address:
-                      //   data.patient?.address2 ?? "",
+                      //   data.patient?.address2 ??
+                      //       "",
                       //   shipmentId: data.orders?.first.shippingId ?? "",
-                      //   orderId: data.orders?.first.orderId ?? "",
-                      //   status: data.orders?.first.status ?? "",
+                      //   orderId: data.orders?.first.orderId ??
+                      //       "",
+                      //   status: data.orders?.first.status ??
+                      //       "",
                       //   addressNo: data.patient?.user?.address ??
                       //       "",
                       //   pickupDate: data.orders?.first.pickupScheduledDate ??
                       //       "",
-                      //   awbNumber: data.orders?.first.awbCode ?? "",
+                      //   awbNumber: data.orders?.first.awbCode ?? '',
                       // ),
                     ),
                   );

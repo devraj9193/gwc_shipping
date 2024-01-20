@@ -1,41 +1,61 @@
 import 'package:flutter/material.dart';
-import 'package:sizer/sizer.dart';
 import 'package:get/get.dart';
+import 'package:jwt_decode/jwt_decode.dart';
+import 'package:shipping_app/screens/shipment_screens/tracking/main_fest_screen.dart';
+import 'package:shipping_app/screens/shipment_screens/tracking/welcome_letter.dart';
+import 'package:sizer/sizer.dart';
+import 'package:http/http.dart' as http;
+import '../../controller/repository/customer_status_repo.dart/customer_status_repo.dart';
+import '../../controller/repository/ship_rocket_repository/ship_track_repo.dart';
+import '../../controller/services/api_services.dart';
+import '../../controller/services/customer_status_service/customer_status_service.dart';
+import '../../controller/services/ship_rocket_service/ship_track_service.dart';
+import '../../model/error_model.dart';
+import '../../model/pending_list_model.dart';
+import '../../model/send_shipping_model.dart';
+import '../../utils/app_config.dart';
 import '../../utils/common_screen_widget.dart';
 import '../../utils/constants.dart';
 import '../../utils/gwc_apis.dart';
+import '../../widgets/customers_list_widgets.dart';
 import '../../widgets/widgets.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:shipping_app/screens/dashboard_screens/dashboard_screen.dart';
+import 'tracking/labels_screen.dart';
+import 'customer_order_products.dart';
+import 'tracking/cook_kit_tracking.dart';
 
-import '../shipment_screens/customer_order_products.dart';
-
-class PendingPausedOrderDetails extends StatefulWidget {
-  final String userName;
-  final String address;
-  final String addressNo;
-  final String userId;
-  const PendingPausedOrderDetails(
-      {Key? key,
-      required this.userName,
-      required this.address,
-      required this.addressNo,
-      required this.userId})
-      : super(key: key);
+class ShippingDetailsScreen extends StatefulWidget {
+  final String? userName;
+  final List<Order>? label;
+  final String? address;
+  final String? addressNo;
+  final String? status;
+  final String? userId;
+  final bool isTracking;
+  const ShippingDetailsScreen({
+    Key? key,
+    this.userName,
+    this.label,
+    this.address,
+    this.addressNo,
+    this.status,
+    this.userId,
+    this.isTracking = false,
+  }) : super(key: key);
 
   @override
-  State<PendingPausedOrderDetails> createState() =>
-      _PendingPausedOrderDetailsState();
+  State<ShippingDetailsScreen> createState() => _ShippingDetailsScreenState();
 }
 
-class _PendingPausedOrderDetailsState extends State<PendingPausedOrderDetails> {
+class _ShippingDetailsScreenState extends State<ShippingDetailsScreen> {
+  final _pref = GwcApi.preferences;
   TextEditingController commentController = TextEditingController();
   TextEditingController otherController = TextEditingController();
   bool isLoading = false;
   String selectedValue = "";
   String selectedValue1 = "";
+
+  late final CustomerStatusService customerStatusService =
+      CustomerStatusService(customerStatusRepo: customerStatusRepo);
 
   @override
   void initState() {
@@ -46,7 +66,27 @@ class _PendingPausedOrderDetailsState extends State<PendingPausedOrderDetails> {
     otherController.addListener(() {
       setState(() {});
     });
-    updateStatus;
+    if (_pref!.getString(AppConfig().shipRocketBearer) == null ||
+        _pref!.getString(AppConfig().shipRocketBearer)!.isEmpty) {
+      getShipRocketToken();
+    } else {
+      String token = _pref!.getString(AppConfig().shipRocketBearer)!;
+      Map<String, dynamic> payload = Jwt.parseJwt(token);
+      print('shipRocketToken : $payload');
+      var date = DateTime.fromMillisecondsSinceEpoch(payload['exp'] * 1000);
+      if (!DateTime.now().difference(date).isNegative) {
+        getShipRocketToken();
+      }
+    }
+  }
+
+  void getShipRocketToken() async {
+    print("getShipRocketToken called");
+    ShipRocketService shipRocketService =
+        ShipRocketService(shipRocketRepository: shipTrackRepository);
+    final getToken = await shipRocketService.getShipRocketTokenService(
+        AppConfig().shipRocketEmail, AppConfig().shipRocketPassword);
+    print(getToken);
   }
 
   @override
@@ -58,61 +98,235 @@ class _PendingPausedOrderDetailsState extends State<PendingPausedOrderDetails> {
 
   @override
   Widget build(BuildContext context) {
-    print(selectedValue1);
-    return SafeArea(
-      child: Scaffold(
-        body: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
+    return Scaffold(
+      backgroundColor: gWhiteColor,
+      body: SafeArea(
+        child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: EdgeInsets.only(top: 1.h, left: 5.w),
-                child: buildAppBar(() {
-                  Navigator.pop(context);
-                }),
-              ),
-              profileTile("Name : ", widget.userName),
-              profileTile(
-                  "Address : ", "${widget.addressNo}, ${widget.address}"),
-              CustomerOrderProducts(
-                userId: widget.userId,
-              ),
-              buildRadioButtons(),
-              SizedBox(height: 3.h),
-              buildStatusText(),
-              SizedBox(height: 8.h),
-              IntrinsicWidth(
-                child: GestureDetector(
-                  onTap: (isLoading)
-                      ? null
-                      : () {
-                          print("ISLOADING : $isLoading");
-                          updateStatus(selectedValue, selectedValue1,
-                              commentController.text.toString());
-                        },
-                  child: Container(
-                    padding:
-                        EdgeInsets.symmetric(vertical: 1.h, horizontal: 5.w),
-                    decoration: BoxDecoration(
-                      color: gSecondaryColor,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: gMainColor, width: 1),
-                    ),
-                    child: (isLoading)
-                        ? buildThreeBounceIndicator(color: gMainColor)
-                        : Text(
-                            'Submit',
-                            style: LoginScreen().buttonText(gWhiteColor),
+                padding: EdgeInsets.symmetric(horizontal: 3.w),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                          child: Icon(
+                            Icons.arrow_back_ios_new_sharp,
+                            color: gSecondaryColor,
+                            size: 2.h,
                           ),
-                  ),
+                        ),
+                        SizedBox(width: 2.w),
+                        SizedBox(
+                          height: 5.h,
+                          child: const Image(
+                            image: AssetImage(
+                                "assets/images/Gut wellness logo.png"),
+                          ),
+                        ),
+                      ],
+                    ),
+                    widget.isTracking
+                        ? GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (ct) => CookKitTracking(
+                                    awbNumber:
+                                        widget.label?.first.awbCode ?? '',
+                                    userName: widget.userName ?? '',
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Image(
+                              image: const AssetImage(
+                                'assets/images/Group 62759.png',
+                              ),
+                              color: gBlackColor,
+                              height: 4.h,
+                            ),
+                          )
+                        : const SizedBox(),
+                  ],
                 ),
               ),
-              SizedBox(height: 2.h),
+              profileTile("Name : ", widget.userName ?? ''),
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 0.5.h, horizontal: 5.w),
+                child: Row(
+                  children: [
+                    Text(
+                      "Status : ",
+                      style: AllListText().otherText(),
+                    ),
+                    Text(
+                      buildStatusText("${widget.status}"),
+                      style: AllListText().deliveryDateText("${widget.status}"),
+                    ),
+                  ],
+                ),
+              ),
+              profileTile(
+                  "Address : ", "${widget.addressNo}, ${widget.address}"),
+              widget.isTracking
+                  ? buildPackedAndDeliveredDetails()
+                  : buildPendingAndPausedDetails(),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  buildPackedAndDeliveredDetails() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        widget.label!.isNotEmpty
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  profileTile(
+                      "Shipment Id : ", widget.label?.first.shippingId ?? ''),
+                  profileTile("Order Id : ", widget.label?.first.orderId ?? ''),
+                  profileTile("Ship Rocket Status : ",
+                      widget.label?.first.status ?? ''),
+                  profileTile("Pickup Schedule : ",
+                      widget.label?.first.pickupScheduledDate ?? ''),
+                ],
+              )
+            : const SizedBox(),
+        SizedBox(height: 1.h),
+        GridView.builder(
+            padding: EdgeInsets.symmetric(horizontal: 3.w),
+            scrollDirection: Axis.vertical,
+            physics: const ScrollPhysics(),
+            shrinkWrap: true,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              crossAxisSpacing: 2.w,
+              mainAxisSpacing: 10,
+              mainAxisExtent: 9.h,
+            ),
+            itemCount: shippingDetails.length,
+            itemBuilder: (context, index) {
+              return GestureDetector(
+                onTap: () {
+                  if (shippingDetails[index]["id"] == "1") {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                          builder: (ct) =>
+                              MainFestScreen(mainFest: widget.label ?? [])),
+                    );
+                  } else if (shippingDetails[index]["id"] == "2") {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (ct) => LabelsScreen(
+                          label: widget.label ?? [],
+                        ),
+                      ),
+                    );
+                  } else if (shippingDetails[index]["id"] == "3") {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (ct) => WelcomeLetterScreen(
+                          label: widget.label ?? [],
+                          userName: widget.userName ?? '',
+                        ),
+                      ),
+                    );
+                  }
+                },
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 4.w),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    color: gSecondaryColor,
+                    //  border: Border.all(color: gMainColor, width: 1),
+                    //   boxShadow: [
+                    //     BoxShadow(
+                    //       color: Colors.grey.withOpacity(0.3),
+                    //       blurRadius: 5,
+                    //       offset: const Offset(2, 6),
+                    //     ),
+                    //   ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Image(
+                        height: 5.h,
+                        image: AssetImage(shippingDetails[index]["image"]),
+                        color: gWhiteColor,
+                      ),
+                      SizedBox(width: 2.w),
+                      Text(
+                        shippingDetails[index]["title"],
+                        style: TextStyle(
+                          fontFamily: "GothamMedium",
+                          color: gWhiteColor,
+                          fontSize: fontSize09,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }),
+        CustomerOrderProducts(
+          userId: "${widget.userId}",
+        ),
+      ],
+    );
+  }
+
+  buildPendingAndPausedDetails() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        CustomerOrderProducts(
+          userId: "${widget.userId}",
+        ),
+        buildRadioButtons(),
+        SizedBox(height: 3.h),
+        buildShippingStatusText(),
+        SizedBox(height: 8.h),
+        Center(
+          child: IntrinsicWidth(
+            child: GestureDetector(
+              onTap: (isLoading)
+                  ? null
+                  : () {
+                      print("ISLOADING : $isLoading");
+                      sendStatus();
+                    },
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: 1.h, horizontal: 5.w),
+                decoration: BoxDecoration(
+                  color: gSecondaryColor,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: gMainColor, width: 1),
+                ),
+                child: (isLoading)
+                    ? buildThreeBounceIndicator(color: gMainColor)
+                    : Text(
+                        'Submit',
+                        style: LoginScreen().buttonText(gWhiteColor),
+                      ),
+              ),
+            ),
+          ),
+        ),
+        SizedBox(height: 2.h),
+      ],
     );
   }
 
@@ -990,91 +1204,7 @@ class _PendingPausedOrderDetailsState extends State<PendingPausedOrderDetails> {
     });
   }
 
-  profileTile(String title, String subTitle) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 0.5.h, horizontal: 5.w),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: AllListText().otherText(),
-          ),
-          Expanded(
-            child: Text(
-              subTitle,
-              style: AllListText().subHeadingText(),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  buildPausedText() {
-    return StatefulBuilder(builder: (_, setState) {
-      return Padding(
-        padding: EdgeInsets.symmetric(horizontal: 5.w),
-        child: Text(
-          "${selectedValue1.toString()} ${otherController.text.toString()}",
-          style: TextStyle(
-            color: newBlackColor,
-            fontFamily: fontMedium,
-            fontSize: fontSize09,
-          ),
-        ),
-      );
-    });
-  }
-
-  void updateStatus(String status, String reason, String weight) async {
-    if (selectedValue.isEmpty) {
-      setState(() {
-        isLoading = false;
-      });
-      showSnackBar(context, "Please Select the status", gSecondaryColor);
-    } else {
-      SharedPreferences preferences = await SharedPreferences.getInstance();
-      var token = preferences.getString("token");
-      var userId = preferences.getInt("user_id");
-
-      Map<String, dynamic> dataBody = {
-        'status': status,
-        'reason': reason,
-        'weight': weight,
-      };
-      print("--- status ---");
-      print(dataBody);
-      print("${GwcApi.shippingUpdateStatus}/$userId");
-      var response = await http.post(
-          Uri.parse("${GwcApi.shippingUpdateStatus}/$userId"),
-          headers: {'Authorization': 'Bearer $token'},
-          body: dataBody);
-      print("Submit Response: ${response.body}");
-      if (response.statusCode == 200) {
-        Map<String, dynamic> responseData = jsonDecode(response.body);
-        if (responseData['status'] == 200) {
-          setState(() {
-            isLoading = true;
-          });
-          Get.to(const DashboardScreen());
-          showSnackBar(context, responseData['data'], gPrimaryColor);
-        } else if (responseData['status'] == 401) {
-          setState(() {
-            isLoading = false;
-          });
-          showSnackBar(context, responseData['message'], gSecondaryColor);
-        } else {
-          setState(() {
-            isLoading = false;
-          });
-          showSnackBar(context, "API Problem", gSecondaryColor);
-        }
-      }
-    }
-  }
-
-  buildStatusText() {
+  buildShippingStatusText() {
     return StatefulBuilder(builder: (_, setState) {
       return Padding(
         padding: EdgeInsets.symmetric(horizontal: 5.w),
@@ -1100,4 +1230,49 @@ class _PendingPausedOrderDetailsState extends State<PendingPausedOrderDetails> {
       );
     });
   }
+
+  sendStatus() async {
+    setState(() {
+      isLoading = true;
+    });
+    print("---------Send Shipping Status---------");
+
+    final result = await customerStatusService.sendShippingStatusService(
+      selectedValue,
+      selectedValue1,
+      commentController.text.toString(),
+      "${widget.userId}",
+    );
+
+    if (result.runtimeType == SendShippingStatusModel) {
+      SendShippingStatusModel model = result as SendShippingStatusModel;
+      setState(() {
+        isLoading = false;
+      });
+      GwcApi().showSnackBar(context, model.errorMsg, isError: false);
+    } else {
+      setState(() {
+        isLoading = false;
+      });
+      ErrorModel response = result as ErrorModel;
+      GwcApi().showSnackBar(context, response.message!, isError: true);
+      // Navigator.of(context).pushReplacement(
+      //   MaterialPageRoute(
+      //     builder: (context) => const DashboardScreen(),
+      //   ),
+      // );
+    }
+  }
+
+  final CustomerStatusRepo customerStatusRepo = CustomerStatusRepo(
+    apiClient: ApiClient(
+      httpClient: http.Client(),
+    ),
+  );
+
+  final ShipRocketRepository shipTrackRepository = ShipRocketRepository(
+    apiClient: ApiClient(
+      httpClient: http.Client(),
+    ),
+  );
 }

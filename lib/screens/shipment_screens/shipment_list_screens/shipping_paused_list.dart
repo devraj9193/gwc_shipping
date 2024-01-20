@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../model/pending_list_model.dart';
-import '../../utils/common_screen_widget.dart';
-import '../../utils/constants.dart';
-import '../../widgets/customers_list_widgets.dart';
-import '../../screens/shipping_order_details_screens/pending_paused_order_details.dart';
+import '../../../model/pending_list_model.dart';
+import '../../../utils/common_screen_widget.dart';
+import '../../../utils/constants.dart';
+import '../../../widgets/customers_list_widgets.dart';
 import '../shipping_details_screen.dart';
 
 class ShippingPausedList extends StatefulWidget {

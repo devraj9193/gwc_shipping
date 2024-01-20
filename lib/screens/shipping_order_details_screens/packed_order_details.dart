@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 import '../../utils/constants.dart';
 import '../../widgets/widgets.dart';
-import '../../shipment_screens/shipment_list_screens/customer_order_products.dart';
+import '../shipment_screens/customer_order_products.dart';
 
 class PackedOrderDetails extends StatefulWidget {
   final String userName;

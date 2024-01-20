@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:shipping_app/screens/shipping_order_details_screens/approved_screens/welcome_letter.dart';
 import 'package:sizer/sizer.dart';
 import '../../../model/pending_list_model.dart';
 import '../../../utils/common_screen_widget.dart';
 import '../../../utils/constants.dart';
 import '../../../widgets/widgets.dart';
-import '../../../shipment_screens/shipment_list_screens/customer_order_products.dart';
-import '../../../shipment_screens/tracking/cook_kit_tracking.dart';
-import 'labels_screen.dart';
-import 'main_fest_screen.dart';
+import '../../shipment_screens/customer_order_products.dart';
+import '../../shipment_screens/tracking/cook_kit_tracking.dart';
+import '../../shipment_screens/tracking/labels_screen.dart';
+import '../../shipment_screens/tracking/main_fest_screen.dart';
+import '../../shipment_screens/tracking/welcome_letter.dart';
 
 class ApprovedOrderDetails extends StatefulWidget {
   final String userName;
